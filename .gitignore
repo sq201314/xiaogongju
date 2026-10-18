@@ -14,6 +14,7 @@ dist/
 installer.py
 version_info.py
 assets/
+卸载性能监控.bat
 
 # pip 临时目录
 pip-*/
