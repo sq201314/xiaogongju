@@ -1,0 +1,7 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# 误克隆进来的远端仓库副本
+xiaogongju/
