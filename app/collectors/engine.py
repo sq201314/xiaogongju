@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 from PySide6.QtCore import QThread, Signal
 
-from ..config import ROOT
+from ..config import BUNDLE
 from .bluetooth import BluetoothCollector
 from .fps import FpsCollector
 from .network import LatencyMonitor, NetworkCollector
@@ -46,7 +46,7 @@ class CollectorEngine(QThread):
         nics = NicCollector()
         latency = LatencyMonitor()
         bluetooth = BluetoothCollector()
-        fps = FpsCollector(ROOT / "tools" / "PresentMon.exe")
+        fps = FpsCollector(BUNDLE / "tools" / "PresentMon.exe")
         fps.start()
         devices: list[dict] = []
         next_bt = 0.0

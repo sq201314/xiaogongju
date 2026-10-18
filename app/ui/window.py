@@ -416,7 +416,8 @@ class MonitorWindow(QWidget):
             return
         self.config["ui_scale"] = scale
         self.config.save()
-        self._restart()
+        # 重启后重新打开设置窗口，避免用户以为界面"闪退"了
+        self._restart(reopen_settings=True)
 
     def set_horizontal_layout(self, horizontal: bool) -> None:
         if horizontal == self.horizontal_layout():
@@ -908,18 +909,26 @@ class MonitorWindow(QWidget):
         self._shutdown()
         QApplication.quit()
 
-    def _restart(self) -> None:
+    def _restart(self, reopen_settings: bool = False) -> None:
         from PySide6.QtCore import QProcess
 
         from ..config import ROOT
 
         self._remember_position()
         self._shutdown()
-        QProcess.startDetached(
-            sys.executable,
-            [str(ROOT / "main.py"), "--replace"],
-            str(ROOT),
-        )
+        args = ["--replace"]
+        if reopen_settings:
+            args.append("--open-settings")
+        if getattr(sys, "frozen", False):
+            # Packaged exe: sys.executable is the app itself, not a Python
+            # interpreter that could re-run main.py.
+            QProcess.startDetached(sys.executable, args, str(ROOT))
+        else:
+            QProcess.startDetached(
+                sys.executable,
+                [str(ROOT / "main.py"), *args],
+                str(ROOT),
+            )
         QApplication.quit()
 
     # ---------------------------------------------------------------- events

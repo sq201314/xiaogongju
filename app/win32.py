@@ -173,6 +173,9 @@ AUTOSTART_NAME = "DesktopPulseWidget"
 
 def _autostart_command() -> str:
     """Command Windows runs at logon, using the same interpreter as this app."""
+    if getattr(sys, "frozen", False):
+        # Packaged exe: launch the exe directly, no interpreter involved.
+        return f'"{Path(sys.executable)}"'
     exe = Path(sys.executable)
     pythonw = exe.with_name("pythonw.exe")
     if exe.name.lower() != "pythonw.exe" and pythonw.exists():

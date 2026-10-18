@@ -32,15 +32,19 @@ def _watch_pid_from_argv(argv: list[str]) -> int | None:
 
 
 def _our_instances() -> list:
-    """Processes that are actually running this script with a Python interpreter.
+    """Processes that are actually running this app.
 
-    Matching is deliberately strict: the executable must be a Python
-    interpreter and some argument must be exactly this file's path (or the bare
-    name `main.py` with this directory as cwd). Loose substring matching would
-    also kill editors / tools that merely have `…\main.py` open.
+    Matching is deliberately strict. Source mode: the executable must be a
+    Python interpreter and some argument must be exactly this file's path (or
+    the bare name `main.py` with this directory as cwd). Loose substring
+    matching would also kill editors / tools that merely have `…\main.py`
+    open. Frozen mode: the executable must be this exe itself.
     """
     import psutil
 
+    frozen = bool(getattr(sys, "frozen", False))
+    our_exe = os.path.normcase(os.path.basename(sys.executable))
+    our_exe_path = os.path.normcase(str(sys.executable))
     interpreters = {
         "python.exe",
         "pythonw.exe",
@@ -56,6 +60,13 @@ def _our_instances() -> list:
         if proc.info["pid"] == os.getpid():
             continue
         cmdline = [str(part) for part in (proc.info.get("cmdline") or [])]
+        if len(cmdline) < 1:
+            continue
+        if frozen:
+            argv0 = os.path.normcase(cmdline[0])
+            if argv0 == our_exe_path or os.path.basename(argv0) == our_exe:
+                found.append(proc)
+            continue
         if len(cmdline) < 2:
             continue
         exe = os.path.basename(os.path.normcase(cmdline[0]))
@@ -156,6 +167,11 @@ def main() -> int:
 
     window = MonitorWindow(config, watch_pid=_watch_pid_from_argv(sys.argv))
     window.show()
+    if "--open-settings" in sys.argv:
+        # 重启后恢复设置窗口（如调整界面缩放触发的重启）
+        from PySide6.QtCore import QTimer
+
+        QTimer.singleShot(400, window._open_settings)
     return app.exec()
 
 

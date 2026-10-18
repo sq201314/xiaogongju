@@ -3,5 +3,20 @@
 __pycache__/
 *.pyc
 
+# PyInstaller 打包产物
+build/
+build2/
+dist/
+*.spec
+
+# 打包脚本 / 安装程序（不上传）
+打包.bat
+installer.py
+version_info.py
+assets/
+
+# pip 临时目录
+pip-*/
+
 # 误克隆进来的远端仓库副本
 xiaogongju/

@@ -3,10 +3,20 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parent.parent
+# Frozen builds (PyInstaller onefile) must not write next to the extracted
+# bundle: `_MEIPASS` is a temp dir wiped on exit. Config lives beside the exe,
+# bundled resources (tools/PresentMon.exe) come from the bundle dir.
+FROZEN = bool(getattr(sys, "frozen", False))
+if FROZEN:
+    ROOT = Path(sys.executable).resolve().parent
+    BUNDLE = Path(getattr(sys, "_MEIPASS", str(ROOT)))
+else:
+    ROOT = Path(__file__).resolve().parent.parent
+    BUNDLE = ROOT
 CONFIG_PATH = ROOT / "config.json"
 
 DEFAULTS: dict[str, Any] = {
