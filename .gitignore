@@ -18,5 +18,8 @@ assets/
 # pip 临时目录
 pip-*/
 
+# 临时图片
+dcf20e87a61c426f1977ed48bf1f42b3.jpg
+
 # 误克隆进来的远端仓库副本
 xiaogongju/
